@@ -3,9 +3,12 @@ package org.corgi.tobyexample.dao;
 import org.corgi.tobyexample.domain.User;
 
 import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class UserDao {
+public abstract class UserDao {
 
     private DataSource dataSource;
 
@@ -56,4 +59,83 @@ public class UserDao {
 
         return user;
     }
+
+
+    public int getCount() throws SQLException {
+
+        Connection c = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            c = dataSource.getConnection();
+
+            ps = c.prepareStatement(
+                    "select count(*) from users");
+
+            rs = ps.executeQuery();
+            rs.next();
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                }
+            }
+
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                }
+            }
+
+            if (c != null) {
+                try {
+                    c.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+
+        return rs.getInt(1);
+    }
+
+
+    public void deleteAll() throws SQLException {
+
+        Connection c = null;
+        PreparedStatement ps = null;
+
+        try {
+            c = dataSource.getConnection();
+
+            StatementStrategy strategy = new DeleteAllStatement();
+            ps = strategy.makePreparedStatement(c);
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+
+                }
+            }
+
+            if (c != null) {
+                try {
+                    c.close();
+                } catch (SQLException e) {
+
+                }
+            }
+        }
+    }
+
+    protected abstract PreparedStatement makeStatement(Connection c) throws SQLException;
 }

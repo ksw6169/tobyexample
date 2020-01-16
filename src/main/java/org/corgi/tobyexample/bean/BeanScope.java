@@ -1,7 +1,6 @@
 package org.corgi.tobyexample.bean;
 
 import org.corgi.tobyexample.domain.User;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
